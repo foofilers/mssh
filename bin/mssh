@@ -26,33 +26,38 @@ def main():
 		if not (args.product in cnf.environments[args.env]):
 			print("Product %s not found" % str(args.product), file=sys.stderr)
 			sys.exit(1)
+		conn_server = args.server
 		if args.server is None:
-			print("Servers in [%s] environment on [%s] product" % (args.env, args.product))
-			for srv_name, srv in cnf.environments[args.env][args.product]['servers'].items():
-				print("Name:%s Host:%s Users:%s" % (srv_name, srv.host, srv.users))
-		else:
-			if not (args.server in cnf.environments[args.env][args.product]['servers']):
-				print("Server %s not found" % str(args.server), file=sys.stderr)
-				sys.exit(1)
-			try:
-				srv = cnf.environments[args.env][args.product]['servers'][args.server]
-				conn_user = args.user
-				if args.user is None and len(srv.users) == 1:
-					conn_user = srv.users[0]
-				for us in srv['users']:
-					if us == args.user:
-						conn_user = args.user
-						break
-				if conn_user is not None:
-					cmd = "ssh %s@%s" % (conn_user, srv.host)
-					print(cmd)
-					os.system(cmd)
-				else:
-					print("User %s not found" % args.user, file=sys.stderr)
+			if len(cnf.environments[args.env][args.product]['servers'])==1:
+				conn_server=next(iter(cnf.environments[args.env][args.product]['servers'].keys()))
+			else:
+				print("Servers in [%s] environment on [%s] product" % (args.env, args.product))
+				for srv_name, srv in cnf.environments[args.env][args.product]['servers'].items():
+					print("Name:%s Host:%s Users:%s" % (srv_name, srv.host, srv.users))
 					sys.exit(1)
 
-			except KeyError as e:
-				print("Environment %s not found" % str(e), file=sys.stderr)
+		if not (conn_server in cnf.environments[args.env][args.product]['servers']):
+			print("Server %s not found" % str(args.server), file=sys.stderr)
+			sys.exit(1)
+		try:
+			srv = cnf.environments[args.env][args.product]['servers'][conn_server]
+			conn_user = args.user
+			if args.user is None and len(srv.users) == 1:
+				conn_user = srv.users[0]
+			for us in srv['users']:
+				if us == args.user:
+					conn_user = args.user
+					break
+			if conn_user is not None:
+				cmd = "ssh %s@%s" % (conn_user, srv.host)
+				print(cmd)
+				os.system(cmd)
+			else:
+				print("User %s not found" % args.user, file=sys.stderr)
+				sys.exit(1)
+
+		except KeyError as e:
+			print("Environment %s not found" % str(e), file=sys.stderr)
 
 
 if __name__ == '__main__':

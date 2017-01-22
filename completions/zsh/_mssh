@@ -1,0 +1,28 @@
+#compdef mssh
+
+_mssh(){
+
+    _arguments \
+        '1: :->envs'\
+        '2: :->prod'\
+        '3: :->server'\
+        '4: :->user'
+
+    case $state in
+    envs)
+        envs=$(mssh --completions)
+        _arguments '1:Environment:(${envs})'
+    ;;
+    prod)
+        _arguments '2:Products:($(mssh --completions $words[2] | tr \\n " "))'
+    ;;
+    server)
+        _arguments '3:Servers:(($(mssh --completions $words[2] $words[3]| tr \\n " ")))'
+    ;;
+    user)
+        _arguments '4:Users:($(mssh --completions $words[2] $words[3] $words[4] | tr \\n " "))'
+    ;;
+    esac
+}
+
+

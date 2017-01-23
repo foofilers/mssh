@@ -9,14 +9,14 @@ cnf = MsshConfig().load()
 
 def completions(args):
 	if args.env is None:
-		print(' '.join(cnf.environments.keys()))
+		print('\n'.join(cnf.environments.keys()))
 		return
 	if args.product is None:
 		print('\n'.join(cnf.environments[args.env].keys()))
 		return
 	if args.server is None:
 		for srv_name,srv in cnf.environments[args.env][args.product]['servers'].items():
-			print("%s: %s" % (srv_name, srv.host))
+			print("%s:%s" % (srv_name, srv.host))
 		return
 	if args.user is None:
 		print('\n'.join(cnf.environments[args.env][args.product]['servers'][args.server]['users']))

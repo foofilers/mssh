@@ -10,8 +10,7 @@ _mssh(){
 
     case $state in
     envs)
-        envs=$(mssh --completions)
-        _arguments '1:Environment:(${envs})'
+        _arguments '1:Environments:($(mssh --completions | tr \\n " "))'
     ;;
     prod)
         _arguments '2:Products:($(mssh --completions $words[2] | tr \\n " "))'

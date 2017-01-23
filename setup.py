@@ -16,7 +16,7 @@ setup(
 	scripts=['bin/mssh'],
 	include_package_data=True,
 	data_files=[
-		('/usr/share/zsh/vendor-completions',['completions/zsh/_mssh']),
-		('/usr/share/bash-completion/completions',['completions/bash/mssh'])
+		('completions',['completions/zsh/_mssh']),
+		('completions',['completions/bash/mssh'])
 	]
 )

@@ -1,0 +1,15 @@
+language: python
+python:
+- '3.2'
+- '3.3'
+- '3.4'
+- '3.5'
+install: pip install .
+script: py.test
+deploy:
+  provider: pypi
+  user: n3wtron
+  password:
+    secure: dFVWwJwCzvALCe20PX71tE1Gp2Msx41tAtJti2RfKIFBKgj9FSfmkT98dmRVdxRIvs/ZaKtSbX9A/OxnbaEiauZ//jwRVxBzhqNMl8MQnbS6v14a13n2iW8z0oN4fIiEMgWL7tURUz1FW9v9EvwFQsgrterpIw2b/yOBM7HK3BAcMY/oYbiipicx7Z5cGvSdKhi3R7Gfyk6UkP32OlBKGVJcZZZL5DpWzgkZwdCTGnQQfCEB8YiCwckmCiN+TlO0MNsjUGoPqC2wQ6uHfFC+fxM9MWfx0hgnMIiUUbOq5xSZzish5uggLbz6Vby+tTc9CXY5CE2WokzKOlL/MITbSAWPEkvOpmNJiTadeKH45iP94v/Y8EWs3s1DYS4mSBJMaOXOHE6qvL8sD1CUVt9VoArx0EYZFx6PCA7kLCxg5aN9w5nIhidAAMYCA02F3WyFvwRi4+s/0K2aUCzu1Aq453hgXU+LqyWiU2wnpAYfrVj2zwYDR1jerZwWk+aGNYWKXQyCUAR3EdryMlQEzj+DJEZn0ZPDa9OYb3pOx63qbrIxc+HlSIGkHC/jgHD5A6E/crTYSwpbQ7GMVUQSgo6rn84WYCNVF41hlT17C2cgiJfnEeafN0uV2e8jYN626NJzlUF7YsnRSQOWrK/t93yt+a6CKRL0M/yGu3jqAHwieac=
+  on:
+    tags: true

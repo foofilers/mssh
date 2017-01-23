@@ -12,7 +12,7 @@ setup(
 	author_email='n3wtron@gmail.com',
 	description='ssh manager',
 	keywords=['ssh','manager'],
-	requires=['PyYAML'],
+	install_requires=['PyYAML'],
 	scripts=['bin/mssh'],
 	include_package_data=True,
 	data_files=[

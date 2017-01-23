@@ -4,13 +4,19 @@ from setuptools import find_packages
 
 setup(
 	name='mssh',
-	version='0.1',
+	version='0.1.1',
 	packages=find_packages(),
-	url='https://github.com/foofilers/mssh2',
+	url='https://github.com/foofilers/mssh',
 	license='GPLv3',
 	author='Igor Maculan',
 	author_email='n3wtron@gmail.com',
 	description='ssh manager',
+	keywords=['ssh','manager'],
 	requires=['PyYAML'],
-	scripts=['bin/mssh']
+	scripts=['bin/mssh'],
+	include_package_data=True,
+	data_files=[
+		('/usr/share/zsh/vendor-completions',['completions/zsh/_mssh']),
+		('/usr/share/bash-completion/completions',['completions/bash/mssh'])
+	]
 )

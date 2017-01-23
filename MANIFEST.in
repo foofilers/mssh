@@ -1,0 +1,2 @@
+include completions/zsh/*
+include completions/bash/*

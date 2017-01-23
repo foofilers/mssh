@@ -1,0 +1,10 @@
+# MSSH Bash completions
+
+_mssh(){
+	local curr
+	cur=${COMP_WORDS[COMP_CWORD]}
+	options=$(mssh --completions ${COMP_WORDS[@]:1})
+	COMPREPLY=( $(compgen -W '${options}' -- $curr) )
+	return 0
+}
+complete -F _mssh mssh

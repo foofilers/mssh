@@ -8,20 +8,40 @@ cnf = MsshConfig().load()
 
 
 def completions(args):
-	if args.env is None:
-		print('\n'.join(cnf.environments.keys()))
-		return
-	if args.product is None:
-		print('\n'.join(cnf.environments[args.env].keys()))
-		return
-	if args.server is None:
-		for srv_name,srv in cnf.environments[args.env][args.product]['servers'].items():
-			print("%s:%s" % (srv_name, srv.host))
-		return
-	if args.user is None:
-		print('\n'.join(cnf.environments[args.env][args.product]['servers'][args.server]['users']))
-		return
+	try:
+		if args.env is None:
+			print('\n'.join(cnf.environments.keys()))
+			return
+		else:
+			if args.env not in cnf.environments:
+				print('\n'.join([e for e in cnf.environments.keys() if e.startswith(args.env)]))
+				return
 
+		if args.product is None:
+			print('\n'.join(cnf.environments[args.env].keys()))
+			return
+		else:
+			if args.product not in cnf.environments[args.env]:
+				print('\n'.join([e for e in cnf.environments[args.env].keys() if e.startswith(args.product)]))
+				return
+
+		if args.server is None:
+			print('\n'.join(cnf.environments[args.env][args.product]['servers'].keys()))
+			return
+		else:
+			if args.server not in cnf.environments[args.env][args.product]['servers']:
+				print('\n'.join([e for e in cnf.environments[args.env][args.product]['servers'].keys() if e.startswith(args.server)]))
+				return
+				
+		if args.user is None:
+			print('\n'.join(cnf.environments[args.env][args.product]['servers'][args.server]['users']))
+			return
+		else:
+			if args.user not in cnf.environments[args.env][args.product]['servers'][args.server]['users']:
+				print('\n'.join([e for e in cnf.environments[args.env][args.product]['servers'][args.server]['users'] if e.startswith(args.user)]))
+				return
+	except KeyError:
+		return
 
 def main():
 	parser = argparse.ArgumentParser(description='Ssh Hub Command line')

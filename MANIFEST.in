@@ -1,2 +1,2 @@
-include completions/zsh/*
-include completions/bash/*
+include mssh/completions/zsh/*
+include mssh/completions/bash/*

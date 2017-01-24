@@ -2,7 +2,10 @@
 import argparse
 import os
 import sys
+import mssh
+from shutil import copyfile
 from mssh.config import MsshConfig
+import getpass
 
 cnf = MsshConfig().load()
 
@@ -43,9 +46,24 @@ def completions(args):
 	except KeyError:
 		return
 
+def setup():
+	if getpass.getuser() != 'root':
+		print("You have to run this from root user", file=sys.stderr)
+		return 
+		
+	bash_installation = input ("Would you like to install completions for bash? [Y/n]: ")
+	if bash_installation=="" or bash_installation=='y' or bash_installation=='Y':
+		bash_completion_path = os.path.join(mssh.__path__[0], 'completions','bash','mssh')
+		copyfile(bash_completion_path,'/usr/share/bash-completion/completions/mssh')
+	zsh_installation = input ("Would you like to install completions for zsh? [Y/n]: ")
+	if zsh_installation=="" or zsh_installation=='y' or zsh_installation=='Y':
+		zsh_completion_path = os.path.join(mssh.__path__[0], 'completions','zsh','_mssh')
+		copyfile(zsh_completion_path,'/usr/share/zsh/vendor-completions/_mssh')
+
 def main():
 	parser = argparse.ArgumentParser(description='Ssh Hub Command line')
 	parser.add_argument('--completions', action='store_true')
+	parser.add_argument('--setup', action='store_true')
 	parser.add_argument('env', help='Environment', nargs='?', type=str, default=None)
 	parser.add_argument('product', help='Product name', type=str, nargs='?', default=None)
 	parser.add_argument('server', help='Server name or alias', nargs='?', type=str, default=None)
@@ -54,51 +72,54 @@ def main():
 
 	if args.completions:
 		completions(args)
+		return 
+	if args.setup:
+		setup()
+		return
+
+	if not (args.env in cnf.environments):
+		print("Environment %s not found" % str(args.env), file=sys.stderr)
+		sys.exit(1)
+	if args.product is None:
+		print("Products in [%s] environment" % args.env)
+		for prod in cnf.environments[args.env].keys():
+			print(prod)
 	else:
-
-		if not (args.env in cnf.environments):
-			print("Environment %s not found" % str(args.env), file=sys.stderr)
+		if not (args.product in cnf.environments[args.env]):
+			print("Product %s not found" % str(args.product), file=sys.stderr)
 			sys.exit(1)
-		if args.product is None:
-			print("Products in [%s] environment" % args.env)
-			for prod in cnf.environments[args.env].keys():
-				print(prod)
-		else:
-			if not (args.product in cnf.environments[args.env]):
-				print("Product %s not found" % str(args.product), file=sys.stderr)
-				sys.exit(1)
-			conn_server = args.server
-			if args.server is None:
-				if len(cnf.environments[args.env][args.product]['servers']) == 1:
-					conn_server = next(iter(cnf.environments[args.env][args.product]['servers'].keys()))
-				else:
-					print("Servers in [%s] environment on [%s] product" % (args.env, args.product))
-					for srv_name, srv in cnf.environments[args.env][args.product]['servers'].items():
-						print("Name:%s Host:%s Users:%s" % (srv_name, srv.host, srv.users))
-						sys.exit(1)
-
-			if not (conn_server in cnf.environments[args.env][args.product]['servers']):
-				print("Server %s not found" % str(args.server), file=sys.stderr)
-				sys.exit(1)
-			try:
-				srv = cnf.environments[args.env][args.product]['servers'][conn_server]
-				conn_user = args.user
-				if args.user is None and len(srv.users) == 1:
-					conn_user = srv.users[0]
-				for us in srv['users']:
-					if us == args.user:
-						conn_user = args.user
-						break
-				if conn_user is not None:
-					cmd = "ssh %s@%s" % (conn_user, srv.host)
-					print(cmd)
-					os.system(cmd)
-				else:
-					print("User %s not found" % args.user, file=sys.stderr)
+		conn_server = args.server
+		if args.server is None:
+			if len(cnf.environments[args.env][args.product]['servers']) == 1:
+				conn_server = next(iter(cnf.environments[args.env][args.product]['servers'].keys()))
+			else:
+				print("Servers in [%s] environment on [%s] product" % (args.env, args.product))
+				for srv_name, srv in cnf.environments[args.env][args.product]['servers'].items():
+					print("Name:%s Host:%s Users:%s" % (srv_name, srv.host, srv.users))
 					sys.exit(1)
 
-			except KeyError as e:
-				print("Environment %s not found" % str(e), file=sys.stderr)
+		if not (conn_server in cnf.environments[args.env][args.product]['servers']):
+			print("Server %s not found" % str(args.server), file=sys.stderr)
+			sys.exit(1)
+		try:
+			srv = cnf.environments[args.env][args.product]['servers'][conn_server]
+			conn_user = args.user
+			if args.user is None and len(srv.users) == 1:
+				conn_user = srv.users[0]
+			for us in srv['users']:
+				if us == args.user:
+					conn_user = args.user
+					break
+			if conn_user is not None:
+				cmd = "ssh %s@%s" % (conn_user, srv.host)
+				print(cmd)
+				os.system(cmd)
+			else:
+				print("User %s not found" % args.user, file=sys.stderr)
+				sys.exit(1)
+
+		except KeyError as e:
+			print("Environment %s not found" % str(e), file=sys.stderr)
 
 
 if __name__ == '__main__':

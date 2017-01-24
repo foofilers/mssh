@@ -4,7 +4,7 @@ from setuptools import find_packages
 
 setup(
 	name='mssh',
-	version='0.1.2',
+	version='0.2.0',
 	packages=find_packages(),
 	url='https://github.com/foofilers/mssh',
 	license='GPLv3',
@@ -15,8 +15,7 @@ setup(
 	install_requires=['PyYAML'],
 	scripts=['bin/mssh'],
 	include_package_data=True,
-	data_files=[
-		('completions',['completions/zsh/_mssh']),
-		('completions',['completions/bash/mssh'])
-	]
+	package_data={
+		'mssh':['completions/zsh/_mssh','completions/bash/mssh']
+	}
 )

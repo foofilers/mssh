@@ -1,2 +1,3 @@
 include mssh/completions/zsh/*
 include mssh/completions/bash/*
+include mssh/config/sample/*

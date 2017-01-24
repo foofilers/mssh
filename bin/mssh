@@ -4,7 +4,7 @@ import os
 import sys
 import mssh
 from shutil import copyfile
-from mssh.config import MsshConfig
+from mssh.config import MsshConfig,get_cnf_file_path
 import getpass
 
 cnf = MsshConfig().load()
@@ -43,13 +43,25 @@ def completions(args):
 			if args.user not in cnf.environments[args.env][args.product]['servers'][args.server]['users']:
 				print('\n'.join([e for e in cnf.environments[args.env][args.product]['servers'][args.server]['users'] if e.startswith(args.user)]))
 				return
+
+		if args.command is None or len(args.command)==0:
+			print('\n'.join(cnf.environments[args.env][args.product]['servers'][args.server]['commands'].keys()))
+			return
+		else:
+			if len(args.command)==1 and args.command[0] not in cnf.environments[args.env][args.product]['servers'][args.server]['commands']:
+				print('\n'.join([e for e in cnf.environments[args.env][args.product]['servers'][args.server]['commands'].keys() if e.startswith(args.command[0])]))
+				return
+
 	except KeyError:
 		return
 
+def edit_config():
+	os.system("xdg-open " + get_cnf_file_path())
+
 def setup():
 	if getpass.getuser() != 'root':
-		print("You have to run this from root user", file=sys.stderr)
-		return 
+		print("You have to run this as root", file=sys.stderr)
+		return
 		
 	bash_installation = input ("Would you like to install completions for bash? [Y/n]: ")
 	if bash_installation=="" or bash_installation=='y' or bash_installation=='Y':
@@ -64,10 +76,12 @@ def main():
 	parser = argparse.ArgumentParser(description='Ssh Hub Command line')
 	parser.add_argument('--completions', action='store_true')
 	parser.add_argument('--setup', action='store_true')
+	parser.add_argument('--edit', action='store_true')
 	parser.add_argument('env', help='Environment', nargs='?', type=str, default=None)
 	parser.add_argument('product', help='Product name', type=str, nargs='?', default=None)
 	parser.add_argument('server', help='Server name or alias', nargs='?', type=str, default=None)
 	parser.add_argument('user', help='User', type=str, nargs='?', default=None)
+	parser.add_argument('command', help='Command', type=str, nargs=argparse.REMAINDER, default=None)
 	args = parser.parse_args(sys.argv[1:])
 
 	if args.completions:
@@ -75,6 +89,9 @@ def main():
 		return 
 	if args.setup:
 		setup()
+		return
+	if args.edit:
+		edit_config()
 		return
 
 	if not (args.env in cnf.environments):
@@ -112,7 +129,19 @@ def main():
 					break
 			if conn_user is not None:
 				cmd = "ssh %s@%s" % (conn_user, srv.host)
-				print(cmd)
+				
+				if args.command is not None and len(args.command)>0:
+					if len(args.command)>1:
+						cmd += ' ' + ' '.join(args.command)
+					else:
+						# search command alias
+						curr_server = cnf.environments[args.env][args.product]['servers'][conn_server]
+						if 'commands' in curr_server and args.command[0] in curr_server['commands']:
+							cmd += ' '+cnf.environments[args.env][args.product]['servers'][conn_server]['commands'][args.command[0]]
+						else:
+							cmd += ' ' + args.command[0]
+
+				print(cmd)	
 				os.system(cmd)
 			else:
 				print("User %s not found" % args.user, file=sys.stderr)

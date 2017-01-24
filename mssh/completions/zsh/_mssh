@@ -6,7 +6,8 @@ _mssh(){
         '1: :->envs'\
         '2: :->prod'\
         '3: :->server'\
-        '4: :->user'
+        '4: :->user'\
+        '5: :->command'
 
     case $state in
     envs)
@@ -20,6 +21,9 @@ _mssh(){
     ;;
     user)
         _arguments '4:Users:($(mssh --completions $words[2] $words[3] $words[4] | tr \\n " "))'
+    ;;
+    command)
+        _arguments '5:Commands:($(mssh --completions $words[2] $words[3] $words[4] $words[5] | tr \\n " "))'
     ;;
     esac
 }

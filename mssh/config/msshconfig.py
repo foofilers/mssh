@@ -2,19 +2,29 @@ import shutil
 
 import yaml
 import io
-from os.path import expanduser, sep, exists
+from os.path import expanduser, sep, exists, join
 from os import makedirs
+import mssh.config
 
+def get_cnf_folder_path():
+	return expanduser('~') + sep + '.config' + sep + 'mssh'
+
+def get_cnf_file_path():
+	return get_cnf_folder_path() + sep + 'config.yml'
 
 class MsshConfig(object):
 	def __init__(self, file_name=None):
 		if file_name is None:
-			cnf_folder = expanduser('~') + sep + '.config' + sep + 'mssh' + sep
+			cnf_folder = get_cnf_folder_path()
 			try:
 				makedirs(cnf_folder)
 			except FileExistsError:
 				pass
-			file_name = cnf_folder + 'config.yml'
+			file_name = get_cnf_file_path()
+
+		if not exists(file_name):
+			config_sample = join(mssh.config.__path__[0], 'sample','config_sample.yml')
+			shutil.copyfile(config_sample,file_name)
 
 		self._file_name = file_name
 		self.environments = None

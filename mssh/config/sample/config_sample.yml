@@ -1,0 +1,16 @@
+servers:
+  server1: &server1
+    host: server1.example.com
+    users:
+      - user1
+      - user2
+environments:
+  dev:
+    software1:
+      servers:
+        aliasSrv1:
+          <<: *server1
+          users:
+            - user3
+          commands:
+            test: 'ls -l /tmp'

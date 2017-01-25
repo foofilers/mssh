@@ -57,14 +57,17 @@ environments:
 ## SSH CONNECTION
 ```
 $> mssh dev software1 aliasSrv1 user3
+results: ssh user3@server1.example.com
 ```
 
 ## SSH REMOTE COMMAND with ALIAS
 ```
 $> mssh dev software1 aliasSrv1 user3 test
+results: ssh user3@server1.example.com "ls -l /tmp"
 ```
 ## SSH REMOTE COMMAND 
 ```
 $> mssh dev software1 aliasSrv1 user3 tail -f /var/log/syslog
+results: ssh user3@server1.example.com "tail -f /var/log/syslog"
 ```
 

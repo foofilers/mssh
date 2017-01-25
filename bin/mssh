@@ -63,14 +63,19 @@ def setup():
 		print("You have to run this as root", file=sys.stderr)
 		return
 		
-	bash_installation = input ("Would you like to install completions for bash? [Y/n]: ")
-	if bash_installation=="" or bash_installation=='y' or bash_installation=='Y':
-		bash_completion_path = os.path.join(mssh.__path__[0], 'completions','bash','mssh')
-		copyfile(bash_completion_path,'/usr/share/bash-completion/completions/mssh')
-	zsh_installation = input ("Would you like to install completions for zsh? [Y/n]: ")
-	if zsh_installation=="" or zsh_installation=='y' or zsh_installation=='Y':
-		zsh_completion_path = os.path.join(mssh.__path__[0], 'completions','zsh','_mssh')
-		copyfile(zsh_completion_path,'/usr/share/zsh/vendor-completions/_mssh')
+	bash_completion_system_path = '/usr/share/bash-completion/completions'
+	if os.path.exists(bash_completion_system_path):
+		bash_installation = input ("Would you like to install completions for bash? [Y/n]: ")
+		if bash_installation=="" or bash_installation=='y' or bash_installation=='Y':
+			bash_completion_path = os.path.join(mssh.__path__[0], 'completions','bash','mssh')
+			copyfile(bash_completion_path,bash_completion_system_path+'/mssh')
+	
+	zsh_completion_system_path='/usr/share/zsh/vendor-completions'
+	if os.path.exists(zsh_completion_system_path):
+		zsh_installation = input ("Would you like to install completions for zsh? [Y/n]: ")
+		if zsh_installation=="" or zsh_installation=='y' or zsh_installation=='Y':
+			zsh_completion_path = os.path.join(mssh.__path__[0], 'completions','zsh','_mssh')
+			copyfile(zsh_completion_path,zsh_completion_system_path+'/_mssh')
 
 def main():
 	parser = argparse.ArgumentParser(description='Ssh Manager')
@@ -123,10 +128,7 @@ def main():
 			conn_user = args.user
 			if args.user is None and len(srv.users) == 1:
 				conn_user = srv.users[0]
-			for us in srv['users']:
-				if us == args.user:
-					conn_user = args.user
-					break
+
 			if conn_user is not None:
 				cmd = "ssh %s@%s" % (conn_user, srv.host)
 				
@@ -137,14 +139,14 @@ def main():
 						# search command alias
 						curr_server = cnf.environments[args.env][args.product]['servers'][conn_server]
 						if 'commands' in curr_server and args.command[0] in curr_server['commands']:
-							cmd += ' '+cnf.environments[args.env][args.product]['servers'][conn_server]['commands'][args.command[0]]
+							cmd += ' "'+cnf.environments[args.env][args.product]['servers'][conn_server]['commands'][args.command[0]]+'"'
 						else:
-							cmd += ' ' + args.command[0]
+							cmd += ' "' + args.command[0]+'"'
 
 				print(cmd)	
 				os.system(cmd)
 			else:
-				print("User %s not found" % args.user, file=sys.stderr)
+				print("User parameter is mandatory", file=sys.stderr)
 				sys.exit(1)
 
 		except KeyError as e:

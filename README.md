@@ -31,3 +31,40 @@ optional arguments:
   --edit      Edit configuration
 
 ```
+
+# EXAMPLE
+## CONFIGURATION
+Path : $HOME/.config/mssh/config.yml
+```
+servers:
+  server1: &server1
+    host: server1.example.com
+    users:
+      - user1
+      - user2
+environments:
+  dev:
+    software1:
+      servers:
+        aliasSrv1:
+          <<: *server1
+          users:
+            - user3
+          commands:
+            test: 'ls -l /tmp'
+```
+
+## SSH CONNECTION
+```
+$> mssh dev software1 aliasSrv1 user3
+```
+
+## SSH REMOTE COMMAND with ALIAS
+```
+$> mssh dev software1 aliasSrv1 user3 test
+```
+## SSH REMOTE COMMAND 
+```
+$> mssh dev software1 aliasSrv1 user3 tail -f /var/log/syslog
+```
+

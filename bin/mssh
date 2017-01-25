@@ -73,10 +73,10 @@ def setup():
 		copyfile(zsh_completion_path,'/usr/share/zsh/vendor-completions/_mssh')
 
 def main():
-	parser = argparse.ArgumentParser(description='Ssh Hub Command line')
-	parser.add_argument('--completions', action='store_true')
-	parser.add_argument('--setup', action='store_true')
-	parser.add_argument('--edit', action='store_true')
+	parser = argparse.ArgumentParser(description='Ssh Manager')
+	parser.add_argument('--completions', action='store_true', help=argparse.SUPPRESS)
+	parser.add_argument('--setup', action='store_true', help='Setup auto completions')
+	parser.add_argument('--edit', action='store_true', help='Edit configuration')
 	parser.add_argument('env', help='Environment', nargs='?', type=str, default=None)
 	parser.add_argument('product', help='Product name', type=str, nargs='?', default=None)
 	parser.add_argument('server', help='Server name or alias', nargs='?', type=str, default=None)

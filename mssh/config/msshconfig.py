@@ -32,7 +32,7 @@ class MsshConfig(object):
 	def load(self):
 		if exists(self._file_name):
 			with io.open(self._file_name) as cnf_file:
-				self._parse(yaml.full_load(cnf_file))
+				self._parse(yaml.safe_load(cnf_file))
 		else:
 			self.environments = CnfValue()
 		return self
